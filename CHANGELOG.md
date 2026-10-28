@@ -2,6 +2,68 @@
 
 One feature per release; see [docs/ROADMAP.md](docs/ROADMAP.md) for what comes next.
 
+## 0.8.2 — Redis Cluster, GridFS, shell transactions and FileZilla-style SFTP (2026-10-28)
+
+The rest of the 0.3–0.5 gaps (planned as 0.6.1, renumbered so versions only go up): Oxbench now works with a whole
+Redis Cluster, browses and edits MongoDB GridFS buckets, and runs transactions in the MongoDB shell. The SFTP browser
+gets FileZilla-style transfers.
+
+### Added — Redis Cluster
+- **Cluster mode is detected by itself:** connect to any node and Oxbench works with the whole cluster. Each key
+  goes to the node serving its slot, MOVED / ASK redirects are followed, and every node is dialed through your SSH
+  route and TLS settings. The server shows "Redis Cluster: N primaries, M replicas".
+- The **Key Browser**, delete by pattern, FLUSHDB, export and import cover every primary. Key counts are summed and
+  only db0 is offered.
+- **Console:** commands with a key run on that key's node; a node picker chooses where keyless commands (DBSIZE,
+  KEYS, INFO, MONITOR…) run, and each answer names its node. Transactions stay on one node, cross-slot keys get a
+  hash-tag hint, and sharded pub/sub (SSUBSCRIBE / SPUBLISH) works.
+- **Server Info:** a new **Cluster** tab (state, slot coverage, a slot bar per primary, nodes with role, slots, link
+  and flags, slots being migrated) and a node picker for INFO, Slowlog, Clients and Config. Config, ACL and slow-log
+  changes can apply to every node.
+- **Script Editor:** runs go to their first key's node (keyless runs to a picked node); script cache and function
+  library changes reach every primary. Keyspace events stream from all primaries.
+
+### Added — MongoDB
+- **GridFS:** each database has a GridFS folder of buckets. A bucket tab lists its files (filter, sort, paging),
+  shows their properties and metadata, and previews images, JSON and text. Download, rename and delete files, or drop
+  a bucket, with confirmations. A bucket's `.files` / `.chunks` collections are marked "GridFS".
+- **GridFS upload:** upload files from disk into a bucket (or a new one) with a name, content type and metadata.
+  Uploads and downloads show progress and can be cancelled; a cancelled upload leaves no chunks behind.
+- **Transactions in the shell:** `session.startTransaction()`, `commitTransaction()`, `abortTransaction()` and
+  `endSession()` (the mongosh `db.getMongo().startSession()` forms work too). Reads and writes, `bulkWrite`
+  included, run in the transaction, so a bulkWrite becomes all or nothing.
+- The shell shows an open transaction with its age and writes, Commit and Abort buttons, and warns before the
+  server's transaction time limit (60 s by default). Closing the tab or disconnecting aborts it.
+- Confirmations for writes inside a transaction are asked at commit, naming what each write did. Errors show their
+  TransientTransactionError / UnknownTransactionCommitResult label and what to do next; a standalone server says
+  transactions need a replica set.
+
+### Added — SFTP, FileZilla-style
+- **Target exists prompt** for every clashing file, including those inside folders: Overwrite, Overwrite if source
+  is newer, Resume (continue a partial file), Rename (with a free `name (1).ext` suggested) or Skip, with "Always use
+  this action" for the rest of the transfer. Cancelling it stops the whole batch.
+- **Transfer queue** with Queued / Failed / Successful lists, a configurable number of simultaneous transfers
+  (default 2), cancel, retry and clear.
+- **Speed limits** for uploads and downloads (KB/s, shared by every transfer), and **preserved modification times**
+  (on by default) so Compare and "Overwrite if newer" stay meaningful.
+- **Drop files from Explorer** onto the host pane (or onto one of its folders) to upload them.
+- **Sortable columns** (name, size, modified, permissions; folders stay first) and a **filter** box per pane
+  (Ctrl+F).
+- **Directory comparison**: marks files that exist on one side only, differ in size, or are newer.
+- **Synchronized browsing**: opening a folder (or going up) on one side does the same on the other.
+- **Bookmarks** of local / remote folder pairs per host, and each host reopens at the folders last used.
+
+### Changed
+- SFTP: dragging between the panes no longer relies on HTML5 drag-and-drop, which the desktop webview keeps for file
+  drops from Windows; rows can also be dropped onto a folder in the other pane.
+- MongoDB shell: `bulkWrite` inside a transaction is atomic; outside one it still runs per operation.
+
+### Not yet included
+- Redis Cluster: reads from replicas (READONLY), a merged MONITOR across nodes, and following primaries added while
+  a keyspace watch runs. A cluster behind SSH or TLS is built for but was tested only directly.
+- MongoDB: `session.withTransaction()` and other shell variables; catalog changes inside a transaction (refused,
+  stricter than the server); one session per shell tab; the upload dialog adds files one at a time.
+
 ## 0.8.1 — Dockerfile Builder (2026-10-24)
 
 Point Oxbench at a project folder and get a production-ready Dockerfile: it detects the stack, asks a few guided
@@ -25,7 +87,7 @@ image.
 - Answers remembered per folder (secret values are never stored); Dockerfile syntax highlighting in the editor.
 
 ### Not yet included
-- **0.6.1:** Redis Cluster; MongoDB GridFS and shell transactions.
+- **0.8.2:** Redis Cluster; MongoDB GridFS and shell transactions.
 - Building without the Docker CLI (Engine API `/build`), remote engines over SSH, registry push.
 - The language base images are not built in our own tests (templates are checked as text and the build path with a
   small image).

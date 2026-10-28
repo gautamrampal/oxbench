@@ -6,7 +6,7 @@
 
 Written in Rust. Starts in under a second, idles at ~35 MB of RAM, ships as a single installer.
 
-[![Download for Windows](https://img.shields.io/badge/Download-Windows%20x64%20installer-6366f1?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/gautamrampal/oxbench/releases/latest/download/Oxbench_0.8.1_x64-setup.exe)
+[![Download for Windows](https://img.shields.io/badge/Download-Windows%20x64%20installer-6366f1?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/gautamrampal/oxbench/releases/latest/download/Oxbench_0.8.2_x64-setup.exe)
 &nbsp;
 [![Latest release](https://img.shields.io/github/v/release/gautamrampal/oxbench?style=for-the-badge&color=0ea5e9)](https://github.com/gautamrampal/oxbench/releases/latest)
 
@@ -25,7 +25,7 @@ Developers juggle five tools: a database GUI, an API client, an SSH client, a Do
 | ⚡ **Native speed** | Rust core, system WebView, no bundled browser or runtime. Cold start < 1 s. |
 | 🗄️ **Five database engines** | PostgreSQL, MySQL / MariaDB, SQLite, Redis / Valkey and MongoDB, each with the tools it deserves. |
 | 🔌 **API client** | Collections, environments, cookie jar, code generation, Postman and cURL import. |
-| 🖥️ **SSH & terminal** | Host vault, tabs and split panes, SFTP, port forwarding, keys, X11. |
+| 🖥️ **SSH & terminal** | Host vault, tabs and split panes, FileZilla-style SFTP, port forwarding, keys, X11. |
 | 🐳 **Docker** | Containers, logs, stats, shells, images, volumes, networks, and a Dockerfile Builder. |
 | 🧩 **Schema tools** | ER diagrams and schema diff with migration SQL. |
 | 🔒 **Secure by default** | Passwords, tokens and passphrases live in Windows Credential Manager, never in config files. Destructive actions are confirmed in the Rust core. |
@@ -34,7 +34,7 @@ Developers juggle five tools: a database GUI, an API client, an SSH client, a Do
 
 ## Download
 
-**[⬇ Oxbench 0.8.1 for Windows (x64)](https://github.com/gautamrampal/oxbench/releases/latest/download/Oxbench_0.8.1_x64-setup.exe)** — installs for the current user, no admin rights needed. An MSI package is on the [releases page](https://github.com/gautamrampal/oxbench/releases/latest).
+**[⬇ Oxbench 0.8.2 for Windows (x64)](https://github.com/gautamrampal/oxbench/releases/latest/download/Oxbench_0.8.2_x64-setup.exe)** — installs for the current user, no admin rights needed. An MSI package is on the [releases page](https://github.com/gautamrampal/oxbench/releases/latest).
 
 - Windows 10 / 11, 64-bit. The installer adds the WebView2 runtime if it is missing (Windows 11 already has it).
 - The binary is not code-signed yet, so Windows SmartScreen may show "Windows protected your PC". Click **More info → Run anyway**.
@@ -93,11 +93,21 @@ Compare two databases of the same engine (the servers may differ). A tree of cha
 
 Key Browser with incremental SCAN, namespace tree and bulk delete with a dry run; viewers and compare-and-swap editors for strings, hashes, lists, sets, sorted sets, streams and JSON; a redis-cli style console with pub/sub and MONITOR panes; Server Info with live tiles, slowlog, clients, editable config and an ACL editor; keyspace events; a Lua / Functions script editor; key import / export; Sentinel with failover.
 
+<img src="screenshots/14-redis-cluster.png" alt="Redis Cluster tab with slot map and nodes" width="900">
+
+**Redis Cluster** is detected by itself: keys go to the node serving their slot, MOVED / ASK redirects are followed, the Key Browser scans every primary, the console has a node picker, and Server Info gains a Cluster tab with the slot map and nodes.
+
 ### MongoDB
 
 <img src="screenshots/08-mongodb.png" alt="MongoDB documents" width="900">
 
 Documents in List, Table and JSON views with live-validated filter, projection and sort; a typed document editor with conflict detection; aggregation stage cards with per-stage previews; indexes; explain; a mongosh-style shell; change streams; schema analysis; users and roles; import and export of JSON Lines, JSON and CSV.
+
+<img src="screenshots/15-mongodb-gridfs.png" alt="MongoDB GridFS bucket browser with metadata and image preview" width="900">
+
+**GridFS** buckets with a file list, previews of images, JSON and text, upload and download with progress, rename and delete. **Transactions** in the shell (`session.startTransaction()` … `commitTransaction()`), with an open-transaction badge, Commit / Abort buttons and confirmations asked at commit.
+
+<img src="screenshots/17-mongodb-transaction.png" alt="MongoDB shell with an open transaction" width="900">
 
 ### API client
 
@@ -109,7 +119,11 @@ Requests with params, path variables, headers, every body type (JSON, XML, text,
 
 <img src="screenshots/10-ssh.png" alt="SSH terminal and SFTP" width="900">
 
-A host vault with groups, tags, jump hosts and `~/.ssh/config` import; password, key, agent and keyboard-interactive auth; host-key verification; terminals with split panes, broadcast, search and snippets; local shells (PowerShell, cmd, Git Bash, WSL); a two-pane SFTP browser with drag and drop; Ed25519, RSA and ECDSA key generation; local, remote and SOCKS5 port forwarding; X11 forwarding.
+A host vault with groups, tags, jump hosts and `~/.ssh/config` import; password, key, agent and keyboard-interactive auth; host-key verification; terminals with split panes, broadcast, search and snippets; local shells (PowerShell, cmd, Git Bash, WSL); a two-pane SFTP browser with drag and drop (also from Explorer); Ed25519, RSA and ECDSA key generation; local, remote and SOCKS5 port forwarding; X11 forwarding.
+
+<img src="screenshots/16-sftp-transfers.png" alt="SFTP browser with directory comparison and the transfer queue" width="900">
+
+**FileZilla-style SFTP transfers:** a transfer queue with retry and parallel transfers, a "target exists" prompt (overwrite, overwrite if newer, resume, rename, skip), speed limits, preserved modification times, directory comparison, synchronized browsing, sortable columns with a filter, and per-host bookmarks.
 
 ### Docker
 
@@ -139,6 +153,7 @@ Dark and light themes, a command palette (Ctrl+K), workspace shortcuts (Ctrl+Shi
 | ✅ | 0.6 | Engine parity: MySQL / SQLite tools, Redis and MongoDB administration, SSH keys and X11 |
 | ✅ | 0.7 | Schema tools: ER diagram and schema diff |
 | ✅ | 0.8 | Docker workspace and Dockerfile Builder |
+| ✅ | 0.8.2 | Redis Cluster, MongoDB GridFS and shell transactions, FileZilla-style SFTP |
 | ⏳ | 0.9 | Dev tools: JSON / YAML / CSV / XML, JWT, Base64, hashes, UUID, timestamps, cron, regex, diff, colour… |
 | ⏳ | 0.10 | API client, advanced: scripts, collection runner, OAuth 2.0, GraphQL explorer, OpenAPI import |
 | ⏳ | 0.11 | Realtime: WebSocket and SSE clients, mock server, load testing |
