@@ -6,7 +6,7 @@
 
 Written in Rust. Starts in under a second, idles at ~35 MB of RAM, ships as a single installer.
 
-[![Download for Windows](https://img.shields.io/badge/Download-Windows%20x64%20installer-6366f1?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/gautamrampal/oxbench/releases/latest/download/Oxbench_0.8.2_x64-setup.exe)
+[![Download for Windows](https://img.shields.io/badge/Download-Windows%20x64%20installer-6366f1?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/gautamrampal/oxbench/releases/latest/download/Oxbench_0.9.0_x64-setup.exe)
 &nbsp;
 [![Latest release](https://img.shields.io/github/v/release/gautamrampal/oxbench?style=for-the-badge&color=0ea5e9)](https://github.com/gautamrampal/oxbench/releases/latest)
 
@@ -34,7 +34,7 @@ Developers juggle five tools: a database GUI, an API client, an SSH client, a Do
 
 ## Download
 
-**[⬇ Oxbench 0.8.2 for Windows (x64)](https://github.com/gautamrampal/oxbench/releases/latest/download/Oxbench_0.8.2_x64-setup.exe)** — installs for the current user, no admin rights needed. An MSI package is on the [releases page](https://github.com/gautamrampal/oxbench/releases/latest).
+**[⬇ Oxbench 0.9.0 for Windows (x64)](https://github.com/gautamrampal/oxbench/releases/latest/download/Oxbench_0.9.0_x64-setup.exe)** — installs for the current user, no admin rights needed. An MSI package is on the [releases page](https://github.com/gautamrampal/oxbench/releases/latest).
 
 - Windows 10 / 11, 64-bit. The installer adds the WebView2 runtime if it is missing (Windows 11 already has it).
 - The binary is not code-signed yet, so Windows SmartScreen may show "Windows protected your PC". Click **More info → Run anyway**.
@@ -86,6 +86,14 @@ Tables as cards with keys and types, foreign keys as crow's-foot relationships, 
 <img src="screenshots/06-schema-diff.png" alt="Schema diff with migration SQL" width="900">
 
 Compare two databases of the same engine (the servers may differ). A tree of changes with a side-by-side DDL diff, and migration SQL for the changes you tick, in a dependency-safe order. Copy it, save it, open it in the Query Tool, or apply it behind a typed confirmation. SQLite table rebuilds are handled for you.
+
+### Data movement
+
+- **Import** CSV, Excel (`.xlsx`, `.xls`, `.ods`) or JSON into a new or existing table: a preview, column mapping with type checks, append / replace / insert-or-update by key, and all-or-nothing or skip-bad-rows.
+- **Export** query results as CSV, JSON, Excel, SQL INSERT, Markdown or HTML, or stream whole tables and queries to a file with no row limit.
+- **Backup and restore** for MySQL / MariaDB (mysqldump or a built-in SQL dump) and SQLite (online copy, `VACUUM INTO`), next to pg_dump / pg_restore for PostgreSQL.
+- **Data compare**: two tables compared row by row by key, the differences side by side, and a sync script to apply.
+- **Copy tables** to another connection, across PostgreSQL, MySQL and SQLite, with types translated and lossy conversions listed first.
 
 ### Redis / Valkey
 
@@ -154,11 +162,12 @@ Dark and light themes, a command palette (Ctrl+K), workspace shortcuts (Ctrl+Shi
 | ✅ | 0.7 | Schema tools: ER diagram and schema diff |
 | ✅ | 0.8 | Docker workspace and Dockerfile Builder |
 | ✅ | 0.8.2 | Redis Cluster, MongoDB GridFS and shell transactions, FileZilla-style SFTP |
-| ⏳ | 0.9 | Dev tools: JSON / YAML / CSV / XML, JWT, Base64, hashes, UUID, timestamps, cron, regex, diff, colour… |
-| ⏳ | 0.10 | API client, advanced: scripts, collection runner, OAuth 2.0, GraphQL explorer, OpenAPI import |
-| ⏳ | 0.11 | Realtime: WebSocket and SSE clients, mock server, load testing |
-| ⏳ | 0.12 | Kafka |
-| ⏳ | 0.13 | gRPC |
+| ✅ | 0.9 | Data movement: import, export, MySQL / SQLite backup, data compare, cross-engine table copy |
+| ⏳ | 0.10 | Dev tools: JSON / YAML / CSV / XML, JWT, Base64, hashes, UUID, timestamps, cron, regex, diff, colour… |
+| ⏳ | 0.11 | API client, advanced: scripts, collection runner, OAuth 2.0, GraphQL explorer, OpenAPI import |
+| ⏳ | 0.12 | Realtime: WebSocket and SSE clients, mock server, load testing |
+| ⏳ | 0.13 | Kafka |
+| ⏳ | 0.14 | gRPC |
 | ⏳ | — | Linux (`.deb`, AppImage) and macOS builds |
 
 Every release is recorded in [CHANGELOG.md](CHANGELOG.md).

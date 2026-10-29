@@ -2,6 +2,75 @@
 
 One feature per release; see [docs/ROADMAP.md](docs/ROADMAP.md) for what comes next.
 
+## 0.9.0 — Data movement: import, export, backup, data compare and table copy (2026-10-29)
+
+Moving data in and out of PostgreSQL, MySQL / MariaDB and SQLite. One Rust pipeline streams typed rows from a source
+to a sink, so files and tables of any size never pass through the window. Dev tools moved to 0.10.
+
+### Added
+- **Import data into a table** from CSV / TSV, Excel (`.xlsx`, `.xls`, `.ods`) or JSON (array or JSON Lines). Open it
+  from a table, schema or database ("Import Data…"), the Tools menu or the palette.
+  - **Step 1, the file:** the format, encoding (UTF-8, UTF-16, Windows-1252), delimiter and header are detected, and a
+    preview shows the first 50 rows. Choose the sheet for Excel files.
+  - **Step 2, the table:** an existing table, or a new one whose column types are guessed from the file. The new
+    table's names and types can be edited, and its CREATE TABLE is shown.
+  - **Step 3, the columns:** match file columns to table columns, or give a constant. Values that won't convert are
+    flagged before the import starts.
+  - **Step 4, how to write:** append, empty the table first (asks you to type a confirmation), or insert-or-update by
+    key. Either all or nothing in one transaction, or skip bad rows and keep the first 100 errors with their file
+    line.
+  - The import shows progress and rows per second, and can be cancelled.
+- **Export:**
+  - **Query results:** Download now also offers Excel, SQL INSERT statements, Markdown and HTML. Copy adds "Copy as
+    INSERT statements" and "Copy as Markdown table".
+  - **Whole tables, views or queries** ("Export Data…", or "Export full result…" in the Query Tool), streamed with
+    no row limit to CSV, TSV, JSON, JSON Lines, Excel (a new sheet every 1,048,575 rows) or SQL INSERT (with an
+    optional CREATE TABLE first). The export shows progress and can be cancelled; a cancelled export leaves no
+    partial file.
+- **Backup and restore for MySQL / MariaDB and SQLite** (PostgreSQL keeps pg_dump / pg_restore):
+  - **MySQL / MariaDB:** `mysqldump` / `mariadb-dump` and `mysql` / `mariadb` are found in a new "MySQL / MariaDB
+    binary path" setting (Edit Server → Advanced), PATH, or the MySQL, MariaDB and WAMP install folders.
+    - Backup options: tables, structure and/or data, a single transaction, routines, triggers, events, hex blobs,
+      extended inserts and DROP statements.
+    - The password goes in a temporary option file that is deleted afterwards, never on the command line.
+  - **Without the client tools,** a built-in SQL dump writes the tables (DDL plus data), views, routines and
+    triggers. It also restores `.sql` files, either stopping at the first error or carrying on.
+  - **SQLite:** an online copy of the database file, or a compacted copy (`VACUUM INTO`). Restore from a `.db`
+    file or a `.sql` script, after you type a confirmation.
+- **Data compare** ("Compare Data…" on a table, the Tools menu or the palette), the row-level partner of Schema Diff:
+  - Pick two tables, on the same engine or MySQL against MariaDB. The key is the primary key, a unique key or
+    columns you pick. You can choose which columns to compare and add a WHERE filter for each side.
+  - Both sides are read in key order, page by page, and the differences are kept in a temporary file, so large
+    tables don't fill memory.
+  - The results show counts (identical, only in source, only in target, different) and a grid for each kind, with
+    changed cells showing the source value over the target value.
+  - A sync script (DELETE, then UPDATE of the changed columns, then INSERT) in one transaction. It can be copied,
+    saved, opened in the Query Tool, or applied after you type the table name; applying it compares again.
+- **Copy tables to another connection, across engines** ("Copy To…" on a table, "Copy Tables To…" on a schema or
+  database):
+  - For each table: create it on the target (types translated between PostgreSQL, MySQL and SQLite, with every lossy
+    conversion listed first), append, empty first, or skip.
+  - Tables are copied parents first, and foreign keys are added once all the data is in.
+  - Identity and auto-increment counters are moved past the copied rows.
+  - Each table shows its own progress, and you choose whether a failed table stops the copy or is skipped.
+- PostgreSQL reads and writes through COPY (binary where every column type allows it).
+
+### Not yet included
+- PostgreSQL import, export, copy and compare were checked only by unit tests in this release, not against a
+  server. MySQL / MariaDB and SQLite were tested against real servers and files.
+- Excel files are read whole into memory. Excel cells hold at most 32,767 characters.
+- CSV and JSON column types are guessed from the first 1,000 rows; a JSON key that first appears later is ignored.
+- MySQL: emptying a table first cannot be rolled back. Zero dates import as NULL. Upsert uses `VALUES()`, which
+  MySQL 8.0.20+ accepts with a deprecation warning.
+- Copy: CHECK constraints, generated expressions, expression and partial indexes, and defaults that don't translate
+  are left out, each with a warning. Copies into SQLite write the foreign keys into CREATE TABLE.
+- Data compare: same engine only. Text keys are sorted byte-wise (on MySQL and PostgreSQL that ORDER BY can't use the
+  index). Rows with NULL in the key are skipped and counted. Apply runs scripts up to 5 MB; larger ones are saved to a
+  file. The confirmation before Apply is in the window only.
+- The built-in restore reads the whole `.sql` file into memory (the client tools stream it).
+- Through an SSH tunnel with TLS verify-full, the MySQL client tools check the certificate against 127.0.0.1 and
+  fail.
+
 ## 0.8.2 — Redis Cluster, GridFS, shell transactions and FileZilla-style SFTP (2026-10-28)
 
 The rest of the 0.3–0.5 gaps (planned as 0.6.1, renumbered so versions only go up): Oxbench now works with a whole
